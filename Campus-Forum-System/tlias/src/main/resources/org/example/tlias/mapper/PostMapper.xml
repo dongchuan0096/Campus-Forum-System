@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.tlias.mapper.PostMapper" >
+    <select id="getPosts" resultType="org.example.tlias.pojo.Post">
+        select * from posts
+        where posts.publish_at &lt;=  #{now}
+            and audi = 1
+        order by updated_at desc
+    </select>
+
+    <select id="searchPosts" resultType="org.example.tlias.pojo.Post">
+        SELECT * FROM posts
+        <where>
+            <if test="postId != null ">
+                post_id = #{postId}
+            </if>
+            <if test="userId != null ">
+                user_id = #{userId}
+            </if>
+            <if test="title != null and title != ''">
+                And title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="createdAt != null">
+                AND created_at &gt;= #{createdAt}
+            </if>
+            <if test="updatedAt != null">
+                AND created_at &lt;=  #{updatedAt}
+            </if>
+            <if test="audi != null">
+                AND audi = #{audi}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPostDetails" statementType="CALLABLE" resultType="java.util.HashMap">
+        {CALL get_post_details(
+                #{postId, mode=IN, jdbcType=INTEGER}
+              )}
+    </select>
+</mapper>
